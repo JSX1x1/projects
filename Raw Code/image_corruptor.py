@@ -6,6 +6,7 @@ from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import Qt
 from PIL import Image, ImageQt
 
+# DO NOT USE THIS PROGRAM FOR HARMFUL OR UNAUTHORIZED INTENDS. ONLY USE FOR PERSONAL USAGE AND EDUCATIONAL REASONS!
 
 class ImageCorruptor(QWidget):
     def __init__(self):
