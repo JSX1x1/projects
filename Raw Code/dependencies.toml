@@ -1,0 +1,10 @@
+[dependencies]
+clap = { version = "4.3", features = ["derive"] }   # CLI argument parsing
+walkdir = "2.3"  # Directory traversal
+image = "0.24"   # Image metadata extraction
+pdf = "0.8"      # PDF metadata extraction
+zip = "0.6"      # ZIP file analysis
+sha2 = "0.10"    # SHA-256 hashing
+md-5 = "0.10"    # MD5 hashing
+pelite = "0.10"  # PE file parsing (Windows binaries)
+object = "0.32"  # ELF/Mach-O binary analysis
