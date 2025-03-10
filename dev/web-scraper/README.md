@@ -1,4 +1,4 @@
-# Ethical Hacker Web Scraper
+# Ethical Hacker Web Scraper - Advanced
 
 This project contains both a Python and a C++ version of a web scraper designed for ethical web scraping and security testing. The scraper extracts information from websites, detects malicious content, checks for spam links, and allows saving the results in CSV format.
 
@@ -32,158 +32,97 @@ This tool is designed for ethical hackers, security testers, and web scraping en
 By using this tool, you agree to the following:
 
 1. **Ethical Use**: This tool is intended for ethical and legal use only. Always ensure you have permission to scrape a website and respect its robots.txt file.
-2. **Compliance with Laws**: The user must comply with all local, national, and international laws, including data protection and privacy regulations (e.g., GDPR, CCPA). Unauthorized web scraping can violate terms of service agreements and result in legal consequences.
-3. **No Malicious Use**: This tool is not intended to be used for hacking or malicious purposes. It is a tool for ethical testing and educational purposes only.
-4. **Respect the Website**: Please respect website resources and avoid excessive or unnecessary scraping that could overload servers. Always abide by the fair usage policies of the websites you scrape.
-5. **Liability**: The authors of this project are not responsible for any misuse, damage, or loss of data arising from the use of this tool.
+2. **Compliance with Laws**: The user must comply with all local, national, and international laws, including data protection and privacy regulations (e.g., GDPR, CCPA). Unauthorized web scraping can violate terms of service agreements and may result in legal consequences.
+3. **Responsibility**: The creator of this tool is not responsible for any actions taken using this tool. It is the responsibility of the user to ensure that their usage complies with applicable laws and ethical standards.
 
 ## Safety Information
 
-- **Data Sensitivity**: Be aware that scraping publicly available data can involve handling sensitive information. Always ensure that your scraping activities do not breach any privacy agreements or data protection regulations.
-- **Security Measures**: Always validate and sanitize any data extracted from websites. Be cautious when executing scripts or downloading files from unknown sources.
-
----
+1. **Website Permissions**: Always check a website’s `robots.txt` to ensure you are allowed to scrape it.
+2. **Rate Limiting**: Avoid sending too many requests in a short period to prevent overloading the target server. Implement delays between requests to comply with ethical scraping practices.
+3. **Data Privacy**: Be mindful of the data you scrape. Do not collect or distribute sensitive personal information without proper authorization.
+4. **Malicious Content**: This tool can detect malicious content, but it is important to use this information responsibly and within legal boundaries.
 
 ## Python Version Setup
 
 ### Dependencies
 
-To run the Python version of this scraper, you need to install the following dependencies:
+To run the Python version of this tool, you need to install the following Python packages:
 
-- **Python 3.x** (preferably Python 3.8 or newer)
-- **pip**: Python’s package installer
-- **Selenium**: To interact with dynamic web pages that load JavaScript
-- **BeautifulSoup4**: To parse HTML
-- **requests**: To make HTTP requests
-- **PyQt6**: For the graphical user interface (GUI)
-- **chromedriver**: Required for Selenium to work with Chrome
+- **requests**: For making HTTP requests to websites.
+- **beautifulsoup4**: For parsing HTML data.
+- **selenium**: For automating web browsers and interacting with dynamic content.
+- **PyQt6**: For creating the GUI.
+
+You can install the dependencies using `pip`:
+
+```bash
+pip install requests beautifulsoup4 selenium PyQt6
+```
+
+Additionally, you need to download the appropriate WebDriver for Selenium. For example, if you're using Chrome, download the [ChromeDriver](https://sites.google.com/chromium.org/driver/).
 
 ### Setup Steps
 
-1. **Install Python 3.x**:
-   Ensure you have Python 3.x installed. You can check if Python is installed by running:
-   ```bash
-   python --version
-   ```
-   If it's not installed, download and install it from [Python's official website](https://www.python.org/).
+1. **Install Python**: Ensure Python 3.6+ is installed on your system. You can download Python from [python.org](https://www.python.org/downloads/).
+2. **Install Dependencies**: Run the following command to install the required Python libraries:
 
-2. **Install Dependencies**:
-   Use `pip` to install the necessary Python packages. Create a virtual environment (optional but recommended) and then install the following dependencies:
+    ```bash
+    pip install requests beautifulsoup4 selenium PyQt6
+    ```
 
-   ```bash
-   pip install selenium beautifulsoup4 requests pyqt6
-   ```
-
-3. **Install ChromeDriver**:
-   - Download the ChromeDriver that matches your version of Google Chrome from [here](https://sites.google.com/a/chromium.org/chromedriver/downloads).
-   - Extract the `chromedriver` executable to a location on your system (e.g., `/usr/local/bin/` on macOS/Linux or `C:\chromedriver\` on Windows).
-
-4. **Ensure Chrome is Installed**:
-   Chrome is required for Selenium to work. Make sure you have it installed. You can download Chrome from [here](https://www.google.com/chrome/).
-
-5. **Test the Setup**:
-   Verify that all dependencies are correctly installed by running the following Python code to check Selenium and ChromeDriver:
-
-   ```python
-   from selenium import webdriver
-   from selenium.webdriver.chrome.service import Service
-   from selenium.webdriver.chrome.options import Options
-
-   chrome_options = Options()
-   chrome_options.add_argument("--headless")
-   driver = webdriver.Chrome(service=Service('/path/to/chromedriver'), options=chrome_options)
-   driver.get("https://www.google.com")
-   print(driver.title)
-   driver.quit()
-   ```
+3. **Download WebDriver**: Download the appropriate WebDriver for your browser (e.g., ChromeDriver for Google Chrome) and ensure it's in your system's PATH or specify the full path in the code.
 
 ### Running the Python Application
 
-1. **Run the Application**:
-   Once the setup is complete, run the Python script:
+1. **Run the Script**: After setting up Python and installing dependencies, run the Python application using:
 
-   ```bash
-   python scraper.py
-   ```
+    ```bash
+    python web_scraper.py
+    ```
 
-2. **Use the GUI**:
-   The application will launch a window where you can input the URL you want to scrape, click "Scrape Website" to retrieve data, and save the results to a CSV file.
-
----
+2. **Interface**: A GUI window will appear where you can input the URL of the website you want to scrape. Click the "Scrape Website" button to start scraping, and view the results in the table.
 
 ## C++ Version Setup
 
 ### Dependencies
 
-To run the C++ version of this scraper, you'll need the following libraries:
+To run the C++ version of the tool, you need the following dependencies:
 
-- **Qt**: To create the GUI (Qt5 or Qt6)
-- **libcurl**: For making HTTP requests
-- **Gumbo**: To parse the HTML content
+- **C++ Compiler**: Ensure you have a C++ compiler installed (e.g., GCC, Clang, MSVC).
+- **CMake**: For managing the build process.
+- **libcurl**: For making HTTP requests.
+- **BeautifulSoup++**: A C++ library for HTML parsing (or you can use other libraries for HTML parsing).
 
 ### Setup Steps
 
-1. **Install Qt**:
-   - Download and install **Qt** from [the Qt website](https://www.qt.io/download). You can also use **Qt Creator** for easier project management.
-   - Ensure Qt is correctly installed and set up in your development environment.
+1. **Install C++ Compiler**: Ensure you have a C++ compiler installed on your system (e.g., GCC for Linux, MSVC for Windows).
+2. **Install libcurl**: Install libcurl to handle HTTP requests.
 
-2. **Install libcurl**:
-   - **Linux**: Use the following command to install libcurl:
-     ```bash
-     sudo apt-get install libcurl4-openssl-dev
-     ```
-   - **Windows**: Download **libcurl** from [here](https://curl.haxx.se/download.html) and follow the installation instructions.
+    - On **Ubuntu**:
 
-3. **Install Gumbo**:
-   - Download Gumbo from its [GitHub repository](https://github.com/google/gumbo-parser).
-   - Follow the instructions in the repository to build and install Gumbo on your system.
+        ```bash
+        sudo apt-get install libcurl4-openssl-dev
+        ```
 
-4. **Set Up the C++ Project**:
-   - Open Qt Creator (or your preferred IDE) and create a new C++ project.
-   - Link the project with **libcurl** and **Gumbo** by configuring the include and library paths in your `.pro` file or project settings.
+    - On **Windows**: Download the [libcurl Windows binaries](https://curl.haxx.se/download.html) and add them to your system's PATH.
+
+3. **Download BeautifulSoup++**: Download the necessary C++ library for HTML parsing or use alternatives (like `htmlcxx`, `gumbo`, etc.).
 
 ### Running the C++ Application
 
-1. **Build the Project**:
-   After setting up the project, build the C++ application using your IDE or run the following command in your terminal if using `qmake`:
-   
-   ```bash
-   qmake && make
-   ```
+1. **Build the C++ Application**: Navigate to the project directory and run the build command (e.g., `make` or `cmake`):
 
-2. **Run the Application**:
-   Once the project is compiled successfully, run the application from your IDE or terminal:
+    ```bash
+    mkdir build
+    cd build
+    cmake ..
+    make
+    ```
 
-   ```bash
-   ./webscraper
-   ```
+2. **Run the Application**: After building, execute the compiled binary:
 
-3. **Use the GUI**:
-   The C++ version provides a GUI similar to the Python version. You can input the URL to scrape, click "Scrape Website", and save the results to a CSV file.
+    ```bash
+    ./web_scraper
+    ```
 
----
-
-## Contributing
-
-We welcome contributions to this project. If you find any bugs, or have suggestions for improvements, feel free to fork the repository and submit pull requests. Ensure that your code adheres to the project's style and is well-documented.
-
----
-
-## Legal Disclaimer
-
-By using this software, you agree to the terms and conditions outlined in the **Legal Disclaimer** section. It is your responsibility to ensure you have permission to scrape the websites you target and to respect all relevant laws and guidelines.
-
-- **No Warranty**: This software is provided "as-is" without any guarantees or warranties. Use it at your own risk.
-- **Copyright**: This tool and its source code are protected under applicable copyright laws. You may use, modify, and distribute the code under the terms of the MIT License.
-
----
-
-**MIT License**
-
-Copyright (c) 2025 [Your Name]
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+3. **Interface**: The application will open a terminal-based interface for inputting the URL and performing scraping.
