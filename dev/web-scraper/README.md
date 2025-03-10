@@ -1,8 +1,4 @@
-Certainly! Below is a detailed README for both the Python and C++ versions of the web scraper. This README includes installation instructions, legal disclaimers, and safety information.
-
----
-
-# Ethical Hacker Web Scraper - Advanced
+# Ethical Hacker Web Scraper
 
 This project contains both a Python and a C++ version of a web scraper designed for ethical web scraping and security testing. The scraper extracts information from websites, detects malicious content, checks for spam links, and allows saving the results in CSV format.
 
