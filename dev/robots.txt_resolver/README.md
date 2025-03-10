@@ -135,12 +135,6 @@ If you'd like to contribute to this project, feel free to fork it, submit issues
 
 ---
 
-## License
-
-This project is open-source and released under the [MIT License](/workspaces/projects/dev/LICENSE). Feel free to use, modify, and distribute this tool as per the terms of the license.
-
----
-
 ## Acknowledgements
 
 - **Flask**: A micro web framework used for creating the backend server.
