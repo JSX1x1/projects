@@ -81,9 +81,6 @@ This repository is provided as-is, and the responsibility of proper usage lies e
 
 If you have any questions, concerns, or need clarification on the ethical use of any tools or scripts in this repository, feel free to reach out to the repository owner.
 
-**Stay Safe, Ethical, and Responsible!**
-JSX_1x1
-
 ---
 
 ## **📜 LICENSE & USAGE TERMS**  
