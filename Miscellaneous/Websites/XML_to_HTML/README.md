@@ -107,7 +107,7 @@ Feel free to fork the repository and submit pull requests if you'd like to contr
 
 ## License
 
-This project is open source and available under the [MIT License](LICENSE).
+This project is open source and available under the [MIT License](https://github.com/JSX1x1/projects/blob/main/Miscellaneous/Websites/LICENSE).
 
 ---
 
