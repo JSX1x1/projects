@@ -29,7 +29,7 @@ This project allows you to upload a Markdown file (.md) and converts it to HTML 
    If you're cloning the repository, run the following command:
 
    ```bash
-   git clone https://github.com/your-username/markdown-to-html-parser.git
+   git clone https://github.com/JSX1x1/projects/tree/main/Miscellaneous/Websites/Markdown_to_HTML.git
    ```
 
 2. **Open the `index.html` file**:
