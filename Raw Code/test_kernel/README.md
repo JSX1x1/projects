@@ -191,7 +191,7 @@ To compile and run the kernel, follow these steps:
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/kernel-assembly.git
+   git clone https://github.com/JSX1x1/projects/tree/main/Raw%20Code/test_kernel.git
    cd kernel-assembly
    ```
 
