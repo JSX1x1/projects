@@ -1,6 +1,3 @@
-Sure! Here's a sample `README.md` for your Blockchain repository path:
-
-```markdown
 # Blockchain Projects
 
 This repository contains various Blockchain-related projects designed for educational purposes. Each project aims to showcase different aspects of Blockchain technology, such as smart contracts, consensus algorithms, cryptocurrency implementations, and more.
@@ -28,7 +25,7 @@ To get started with any project, follow these steps:
 1. **Clone this repository:**
 
    ```bash
-   git clone https://github.com/your-username/repository.git
+   git clone https://github.com/JSX1x1/projects/tree/main/Miscellaneous/BlockChain
    ```
 
 2. **Navigate to the desired project directory:**
