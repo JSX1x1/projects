@@ -37,7 +37,7 @@ To run the project locally:
 
 1. **Clone this repository**:
    ```bash
-   git clone https://github.com/your-username/xml-to-html-converter.git
+   git clone https://github.com/JSX1x1/projects/tree/main/Miscellaneous/Websites/XML_to_HTML.git
    ```
 
 2. **Navigate to the project directory**:
