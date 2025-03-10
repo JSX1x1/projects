@@ -1,6 +1,3 @@
-Here’s a detailed **README.md** for your **Websites Path**:
-
-```markdown
 # Websites Path
 
 This directory contains a collection of small website projects, each with a specific purpose, use case, or testing scenario. These projects serve various functions, ranging from educational purposes to experimentation with new technologies. Each project is explained in its respective folder, so users can easily understand its purpose and how to interact with it.
@@ -48,7 +45,7 @@ Each project in this repository is self-contained. To get started with a project
 1. **Clone or Download the Repository**: Clone this repository or download the specific project you want to explore.
    
    ```
-   git clone https://github.com/yourusername/yourrepository.git
+   git clone https://github.com/JSX1x1/projects/tree/main/Miscellaneous/Websites.git
    ```
 
 2. **Navigate to the Project Folder**: Each project has its own folder with the necessary files.
