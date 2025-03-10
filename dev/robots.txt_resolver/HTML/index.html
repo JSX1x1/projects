@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robots.txt Checker - Hacker Style</title>
+    <style>
+        body {
+            background-color: black;
+            color: green;
+            font-family: "Courier New", Courier, monospace;
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        input, button {
+            background-color: black;
+            color: green;
+            border: 2px solid green;
+            padding: 10px;
+            font-size: 1em;
+        }
+
+        input {
+            width: 300px;
+        }
+
+        button {
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        textarea {
+            width: 80%;
+            height: 200px;
+            background-color: black;
+            color: green;
+            border: 2px solid green;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 1em;
+            margin-top: 20px;
+            padding: 10px;
+            resize: none;
+            overflow: auto;
+        }
+
+        #result {
+            font-size: 1.2em;
+            margin-top: 20px;
+        }
+
+        .hacker-style {
+            font-size: 1.2em;
+            margin-top: 10px;
+        }
+
+        .explanation {
+            font-size: 1em;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Robots.txt Checker</h1>
+    <input type="text" id="url" placeholder="Enter website URL (e.g., https://example.com)">
+    <button onclick="checkRobots()">Check robots.txt</button>
+
+    <div id="result" class="hacker-style"></div>
+    <textarea id="robotsOutput" readonly></textarea>
+
+    <script>
+        async function checkRobots() {
+            let url = document.getElementById('url').value;
+            let resultDiv = document.getElementById('result');
+            let outputTextArea = document.getElementById('robotsOutput');
+
+            if (!url) {
+                resultDiv.innerText = "Please enter a valid URL!";
+                return;
+            }
+
+            try {
+                let response = await fetch(`/get-robots?url=${encodeURIComponent(url)}`);
+                let data = await response.json();
+
+                if (data.status === 'success') {
+                    outputTextArea.value = data.robots_txt;
+                    resultDiv.innerHTML = `<strong>robots.txt found for ${url}</strong>`;
+                } else {
+                    resultDiv.innerHTML = `Error: ${data.message}`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = "Failed to fetch robots.txt. Please try again.";
+            }
+        }
+    </script>
+
+</body>
+</html>
