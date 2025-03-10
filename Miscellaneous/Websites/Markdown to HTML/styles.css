@@ -1,0 +1,52 @@
+body {
+    font-family: 'Courier New', Courier, monospace;
+    background-color: #1c1c1c;
+    color: #00ff00;
+    margin: 0;
+    padding: 0;
+}
+h1, h2, h3 {
+    color: #ff9900;
+}
+h1 {
+    text-align: center;
+    margin-top: 20px;
+}
+.container {
+    width: 80%;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #2c2c2c;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+.file-input {
+    margin: 20px auto;
+    display: block;
+    background-color: #ff9900;
+    color: black;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+.file-input:hover {
+    background-color: #cc7a00;
+}
+.output {
+    background-color: #333;
+    color: #00ff00;
+    padding: 20px;
+    border-radius: 8px;
+    white-space: pre-wrap;
+    font-size: 16px;
+}
+footer {
+    text-align: center;
+    padding: 20px;
+    color: #ff9900;
+    font-size: 12px;
+    position: absolute;
+    bottom: 10px;
+    width: 100%;
+}
