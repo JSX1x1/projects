@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hex Dump Analyzer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code&display=swap');
+
+        body {
+            font-family: 'Fira Code', monospace;
+            text-align: center;
+            padding: 20px;
+            background-color: #121212;
+            color: #00eaff;
+        }
+
+        h1 {
+            text-shadow: 0 0 10px #00eaff, 0 0 20px #0077ff;
+        }
+
+        textarea {
+            width: 80%;
+            height: 150px;
+            background: #000;
+            color: #00ff00;
+            border: 2px solid #00eaff;
+            padding: 10px;
+            font-size: 16px;
+            font-family: 'Fira Code', monospace;
+            box-shadow: 0px 0px 10px #00eaff;
+        }
+
+        button {
+            background: transparent;
+            border: 2px solid #00eaff;
+            padding: 10px;
+            color: #00eaff;
+            font-size: 18px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            box-shadow: 0 0 10px #00eaff;
+        }
+
+        #output {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.9);
+            display: inline-block;
+            border-radius: 10px;
+            box-shadow: 0px 0px 20px #00eaff;
+            text-align: left;
+            width: 80%;
+            word-wrap: break-word;
+        }
+
+        pre {
+            background: #000;
+            color: #00ff00;
+            padding: 10px;
+            overflow-x: auto;
+            border-radius: 5px;
+            box-shadow: 0 0 10px #00ff00;
+        }
+
+        footer {
+            margin-top: 20px;
+            font-size: 14px;
+            text-shadow: 0 0 5px #00eaff;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Hex Dump Analyzer</h1>
+    <p>Paste a hex dump below for forensic analysis:</p>
+    
+    <textarea id="hexInput" placeholder="Enter hex dump (space-separated, e.g., 89 50 4E 47 0D 0A 1A 0A)"></textarea>
+    <br>
+    <button onclick="analyzeHexDump()">Analyze</button>
+    <div id="output"></div>
+
+    <footer>
+        <p><strong>Disclaimer:</strong> This tool is for educational and cybersecurity research purposes only. 
+            Misuse of this tool for illegal or unethical activities is strictly prohibited. 
+            The creator assumes no responsibility for any misuse.</p>
+    </footer>
+
+    <script>
+        console.warn("%c⚠️ Disclaimer: This tool is for educational purposes only. Any misuse is strictly prohibited.", "color: yellow; font-size: 16px; text-shadow: 0px 0px 5px #ff0000;");
+
+        function analyzeHexDump() {
+            const hexInput = document.getElementById("hexInput").value.trim();
+            if (!hexInput) {
+                alert("Please enter a hex dump.");
+                return;
+            }
+
+            const hexArray = hexInput.split(/\s+/).map(byte => parseInt(byte, 16));
+            const outputDiv = document.getElementById("output");
+            outputDiv.innerHTML = "";
+
+            // Detect file type from magic bytes
+            const fileType = detectFileType(hexArray);
+            outputDiv.innerHTML += `<h3>Detected File Type:</h3><p>${fileType}</p>`;
+
+            // Convert hex to ASCII & UTF-8
+            const asciiText = hexArray.map(byte => (byte >= 32 && byte <= 126) ? String.fromCharCode(byte) : ".").join("");
+            outputDiv.innerHTML += `<h3>ASCII Representation:</h3><pre>${asciiText}</pre>`;
+
+            // Convert hex to binary
+            const binaryText = hexArray.map(byte => byte.toString(2).padStart(8, '0')).join(" ");
+            outputDiv.innerHTML += `<h3>Binary Representation:</h3><pre>${binaryText}</pre>`;
+
+            // Calculate hashes
+            const wordArray = CryptoJS.lib.WordArray.create(hexArray);
+            const md5Hash = CryptoJS.MD5(wordArray).toString();
+            const sha256Hash = CryptoJS.SHA256(wordArray).toString();
+
+            outputDiv.innerHTML += `<h3>File Hashes:</h3>
+                                    <p><strong>MD5:</strong> ${md5Hash}</p>
+                                    <p><strong>SHA-256:</strong> ${sha256Hash}</p>`;
+
+            // Calculate entropy
+            const entropy = calculateEntropy(hexArray);
+            outputDiv.innerHTML += `<h3>Entropy Analysis:</h3><p>Entropy Score: ${entropy.toFixed(2)} (Higher means more randomness)</p>`;
+        }
+
+        function detectFileType(bytes) {
+            const magicNumbers = {
+                "JPEG": ["ff d8 ff"],
+                "PNG": ["89 50 4e 47 0d 0a 1a 0a"],
+                "PDF": ["25 50 44 46"],
+                "ZIP": ["50 4b 03 04", "50 4b 05 06"],
+                "EXE": ["4d 5a"],
+                "RAR": ["52 61 72 21"],
+                "GIF": ["47 49 46 38"],
+                "MP4": ["66 74 79 70 69 73 6f 6d"]
+            };
+
+            const hexHeader = bytes.slice(0, 8).map(byte => byte.toString(16).padStart(2, '0')).join(" ");
+            for (const [type, signatures] of Object.entries(magicNumbers)) {
+                if (signatures.some(sig => hexHeader.startsWith(sig))) {
+                    return `${type} (Signature Matched)`;
+                }
+            }
+            return "Unknown (No Signature Matched)";
+        }
+
+        function calculateEntropy(bytes) {
+            let entropy = 0;
+            const freq = new Array(256).fill(0);
+            bytes.forEach(byte => freq[byte]++);
+            bytes.forEach(byte => {
+                const p = freq[byte] / bytes.length;
+                if (p > 0) entropy -= p * Math.log2(p);
+            });
+            return entropy;
+        }
+    </script>
+
+</body>
+</html>

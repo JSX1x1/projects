@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Hash Analyzer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code&display=swap');
+
+        body {
+            font-family: 'Fira Code', monospace;
+            text-align: center;
+            padding: 20px;
+            background-color: #121212;
+            color: #00eaff;
+        }
+
+        h1 {
+            text-shadow: 0 0 10px #00eaff, 0 0 20px #0077ff;
+        }
+
+        input, textarea {
+            width: 80%;
+            padding: 10px;
+            background: #000;
+            color: #00ff00;
+            border: 2px solid #00eaff;
+            font-size: 16px;
+            font-family: 'Fira Code', monospace;
+            box-shadow: 0px 0px 10px #00eaff;
+            margin-bottom: 10px;
+        }
+
+        button {
+            background: transparent;
+            border: 2px solid #00eaff;
+            padding: 10px;
+            color: #00eaff;
+            font-size: 18px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            box-shadow: 0 0 10px #00eaff;
+        }
+
+        #output {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.9);
+            display: inline-block;
+            border-radius: 10px;
+            box-shadow: 0px 0px 20px #00eaff;
+            text-align: left;
+            width: 80%;
+            word-wrap: break-word;
+        }
+
+        pre {
+            background: #000;
+            color: #00ff00;
+            padding: 10px;
+            overflow-x: auto;
+            border-radius: 5px;
+            box-shadow: 0 0 10px #00ff00;
+        }
+
+        footer {
+            margin-top: 20px;
+            font-size: 14px;
+            text-shadow: 0 0 5px #00eaff;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Advanced Hash Analyzer 🔍</h1>
+    <p>Enter a hash value to analyze:</p>
+    
+    <input type="text" id="hashInput" placeholder="Enter hash value">
+    <br>
+    <button onclick="analyzeHash()">Analyze Hash</button>
+    <br><br>
+    <p>Optional: Enter data to check if it matches the hash:</p>
+    <input type="text" id="dataInput" placeholder="Enter text to compare">
+    <br>
+    <button onclick="compareHash()">Compare Hash</button>
+
+    <div id="output"></div>
+
+    <footer>
+        <p><strong>Disclaimer:</strong> This tool is for educational and cybersecurity research purposes only. 
+            Misuse of this tool for illegal or unethical activities is strictly prohibited. 
+            The creator assumes no responsibility for any misuse.</p>
+    </footer>
+
+    <script>
+        console.warn("%c⚠️ Disclaimer: This tool is for educational purposes only. Any misuse is strictly prohibited.", "color: yellow; font-size: 16px; text-shadow: 0px 0px 5px #ff0000;");
+
+        function analyzeHash() {
+            const hash = document.getElementById("hashInput").value.trim();
+            if (!hash) {
+                alert("Please enter a hash.");
+                return;
+            }
+
+            const outputDiv = document.getElementById("output");
+            outputDiv.innerHTML = `<h3>🔎 Analyzing Hash:</h3><pre>${hash}</pre>`;
+
+            // Detect hash type
+            const hashType = detectHashType(hash);
+            outputDiv.innerHTML += `<h3>🛠️ Detected Hash Type:</h3><p>${hashType}</p>`;
+
+            // Security insights
+            const securityInfo = getHashSecurityInfo(hashType);
+            outputDiv.innerHTML += `<h3>🛡️ Security Analysis:</h3><pre>${securityInfo}</pre>`;
+        }
+
+        function compareHash() {
+            const hash = document.getElementById("hashInput").value.trim();
+            const data = document.getElementById("dataInput").value.trim();
+            if (!hash || !data) {
+                alert("Please enter both a hash and data.");
+                return;
+            }
+
+            const outputDiv = document.getElementById("output");
+
+            // Compute various hashes of the input data
+            const md5Hash = CryptoJS.MD5(data).toString();
+            const sha1Hash = CryptoJS.SHA1(data).toString();
+            const sha256Hash = CryptoJS.SHA256(data).toString();
+            const sha512Hash = CryptoJS.SHA512(data).toString();
+
+            let matchResult = "No match found.";
+            if (hash === md5Hash) matchResult = "✅ Matched MD5!";
+            else if (hash === sha1Hash) matchResult = "✅ Matched SHA-1!";
+            else if (hash === sha256Hash) matchResult = "✅ Matched SHA-256!";
+            else if (hash === sha512Hash) matchResult = "✅ Matched SHA-512!";
+
+            outputDiv.innerHTML += `<h3>🔄 Hash Comparison Result:</h3><p>${matchResult}</p>`;
+        }
+
+        function detectHashType(hash) {
+            const length = hash.length;
+            if (length === 32) return "MD5 (128-bit, Weak)";
+            if (length === 40) return "SHA-1 (160-bit, Weak)";
+            if (length === 64) return "SHA-256 (256-bit, Secure)";
+            if (length === 128) return "SHA-512 (512-bit, Highly Secure)";
+            if (length === 40 && /^[a-f0-9]{40}$/i.test(hash)) return "RIPEMD-160 (Used in Bitcoin)";
+            if (length === 8 && /^[a-f0-9]{8}$/i.test(hash)) return "CRC32 (Not Secure)";
+            return "Unknown or Custom Hash Format";
+        }
+
+        function getHashSecurityInfo(type) {
+            if (type.includes("Weak")) return "⚠️ This hash algorithm is weak and can be cracked easily.";
+            if (type.includes("Secure")) return "✅ This hash is secure for modern cryptographic applications.";
+            return "ℹ️ No known vulnerabilities.";
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced File Signature Identifier</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code&display=swap');
+
+        body {
+            font-family: 'Fira Code', monospace;
+            text-align: center;
+            padding: 20px;
+            background-color: #121212;
+            color: #00eaff;
+        }
+
+        h1 {
+            text-shadow: 0 0 10px #00eaff, 0 0 20px #0077ff;
+        }
+
+        input, button {
+            width: 80%;
+            padding: 10px;
+            background: #000;
+            color: #00ff00;
+            border: 2px solid #00eaff;
+            font-size: 16px;
+            font-family: 'Fira Code', monospace;
+            box-shadow: 0px 0px 10px #00eaff;
+            margin-bottom: 10px;
+        }
+
+        button {
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            box-shadow: 0 0 10px #00eaff;
+        }
+
+        #output {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.9);
+            display: inline-block;
+            border-radius: 10px;
+            box-shadow: 0px 0px 20px #00eaff;
+            text-align: left;
+            width: 80%;
+            word-wrap: break-word;
+        }
+
+        pre {
+            background: #000;
+            color: #00ff00;
+            padding: 10px;
+            overflow-x: auto;
+            border-radius: 5px;
+            box-shadow: 0 0 10px #00ff00;
+        }
+
+        footer {
+            margin-top: 20px;
+            font-size: 14px;
+            text-shadow: 0 0 5px #00eaff;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>File Signature Identifier</h1>
+    <p>Upload a file to analyze its true type based on its magic numbers.</p>
+    
+    <input type="file" id="fileInput">
+    <br>
+    <button onclick="analyzeFile()">Analyze File</button>
+    <div id="output"></div>
+
+    <footer>
+        <p><strong>Disclaimer:</strong> This tool is for educational and cybersecurity research purposes only. 
+            It does not perform unauthorized actions. Misuse for illegal purposes is strictly prohibited.</p>
+    </footer>
+
+    <script>
+        const magicNumbers = {
+            "JPEG": ["ff d8 ff"],
+            "PNG": ["89 50 4e 47 0d 0a 1a 0a"],
+            "PDF": ["25 50 44 46"],
+            "ZIP": ["50 4b 03 04", "50 4b 05 06", "50 4b 07 08"],
+            "EXE (Windows Executable)": ["4d 5a"],
+            "RAR": ["52 61 72 21"],
+            "GIF": ["47 49 46 38"],
+            "MP4 (Video)": ["66 74 79 70 69 73 6f 6d"],
+            "ISO (Disk Image)": ["43 44 30 30 31"],
+            "DOCX (MS Word)": ["50 4b 03 04"], // Office Open XML (ZIP-based)
+            "TXT (Plain Text)": [], // No magic bytes
+            "ISO": ["43 44 30 30 31"],
+            "TAR": ["75 73 74 61 72"],
+            "7Z (7-Zip Archive)": ["37 7a bc af 27 1c"],
+            "ELF (Linux Executable)": ["7f 45 4c 46"],
+            "BMP (Bitmap Image)": ["42 4d"],
+            "WAV (Audio)": ["52 49 46 46"],
+            "AVI (Video)": ["52 49 46 46"],
+            "MP3 (Audio)": ["ff fb", "49 44 33"],
+        };
+
+        function analyzeFile() {
+            const file = document.getElementById("fileInput").files[0];
+            if (!file) {
+                alert("Please select a file.");
+                return;
+            }
+
+            const outputDiv = document.getElementById("output");
+            outputDiv.innerHTML = `<h3>File Name:</h3><p>${file.name}</p>`;
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const bytes = new Uint8Array(event.target.result);
+                const hexHeader = Array.from(bytes.slice(0, 32))
+                    .map(byte => byte.toString(16).padStart(2, "0"))
+                    .join(" ");
+
+                outputDiv.innerHTML += `<h3>Hex Dump (First 32 Bytes):</h3><pre>${hexHeader}</pre>`;
+
+                const detectedType = detectFileType(hexHeader);
+                outputDiv.innerHTML += `<h3>Detected File Type:</h3><p>${detectedType}</p>`;
+
+                const expectedExt = file.name.split('.').pop().toUpperCase();
+                if (detectedType !== "Unknown" && !detectedType.includes(expectedExt)) {
+                    outputDiv.innerHTML += `<h3 style="color: red;">⚠ Warning: Mismatch Detected</h3>
+                        <p>The file extension <strong>${expectedExt}</strong> does not match the detected type <strong>${detectedType}</strong>.</p>`;
+                }
+
+                outputDiv.innerHTML += `<h3>File Metadata:</h3>
+                    <p>File Size: ${file.size} bytes</p>
+                    <p>Last Modified: ${new Date(file.lastModified).toLocaleString()}</p>
+                    <p>MIME Type: ${file.type || "Unknown"}</p>`;
+            };
+            reader.readAsArrayBuffer(file.slice(0, 32));
+        }
+
+        function detectFileType(hexHeader) {
+            for (const [type, signatures] of Object.entries(magicNumbers)) {
+                if (signatures.some(sig => hexHeader.startsWith(sig))) {
+                    return `${type} (Signature Matched)`;
+                }
+            }
+            return "Unknown (No Signature Matched)";
+        }
+    </script>
+
+</body>
+</html>

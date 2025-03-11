@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced MD5 Hash Resolver</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code&display=swap');
+
+        body {
+            font-family: 'Fira Code', monospace;
+            text-align: center;
+            padding: 20px;
+            background-color: #121212;
+            color: #00eaff;
+        }
+
+        h1 {
+            text-shadow: 0 0 10px #00eaff, 0 0 20px #0077ff;
+        }
+
+        input, textarea, button {
+            width: 80%;
+            padding: 10px;
+            background: #000;
+            color: #00ff00;
+            border: 2px solid #00eaff;
+            font-size: 16px;
+            font-family: 'Fira Code', monospace;
+            box-shadow: 0px 0px 10px #00eaff;
+            margin-bottom: 10px;
+        }
+
+        button {
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            box-shadow: 0 0 10px #00eaff;
+        }
+
+        #output {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.9);
+            display: inline-block;
+            border-radius: 10px;
+            box-shadow: 0px 0px 20px #00eaff;
+            text-align: left;
+            width: 80%;
+            word-wrap: break-word;
+        }
+
+        pre {
+            background: #000;
+            color: #00ff00;
+            padding: 10px;
+            overflow-x: auto;
+            border-radius: 5px;
+            box-shadow: 0 0 10px #00ff00;
+        }
+
+        footer {
+            margin-top: 20px;
+            font-size: 14px;
+            text-shadow: 0 0 5px #00eaff;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Advanced MD5 Hash Resolver 🔍</h1>
+    <p>Enter an MD5 hash to attempt resolution (ethical way):</p>
+    
+    <input type="text" id="hashInput" placeholder="Enter MD5 hash">
+    <br>
+    <button onclick="resolveMD5()">Resolve Hash</button>
+    
+    <p>Optional: Upload a dictionary file (one word per line) to check against:</p>
+    <input type="file" id="wordlistFile">
+    <br>
+    <button onclick="checkWithUploadedDictionary()">Check with Dictionary</button>
+
+    <p>Optional: Enter plaintext to hash and compare:</p>
+    <input type="text" id="textInput" placeholder="Enter text to generate MD5">
+    <br>
+    <button onclick="compareWithText()">Compare with MD5</button>
+
+    <div id="output"></div>
+
+    <footer>
+        <p><strong>Disclaimer:</strong> This tool is for educational and cybersecurity research purposes only. 
+            It does not use illegal databases or brute-force attacks. 
+            Misuse of this tool for illegal activities is strictly prohibited. 
+            The creator assumes no responsibility for any misuse.</p>
+    </footer>
+
+    <script>
+        console.warn("%c⚠️ Disclaimer: This tool is for ethical and educational use only. No brute-force or illegal methods used.", "color: yellow; font-size: 16px; text-shadow: 0px 0px 5px #ff0000;");
+
+        // Common hash database for educational purposes
+        const commonHashes = {
+            "5f4dcc3b5aa765d61d8327deb882cf99": "password",
+            "21232f297a57a5a743894a0e4a801fc3": "admin",
+            "098f6bcd4621d373cade4e832627b4f6": "test",
+            "25d55ad283aa400af464c76d713c07ad": "12345678",
+            "5ebe2294ecd0e0f08eab7690d2a6ee69": "secret"
+        };
+
+        function resolveMD5() {
+            const hash = document.getElementById("hashInput").value.trim();
+            if (!hash || hash.length !== 32) {
+                alert("Please enter a valid 32-character MD5 hash.");
+                return;
+            }
+
+            const outputDiv = document.getElementById("output");
+            outputDiv.innerHTML = `<h3>🔎 Analyzing Hash:</h3><pre>${hash}</pre>`;
+
+            if (commonHashes[hash]) {
+                outputDiv.innerHTML += `<h3>✅ Resolved Hash:</h3><p><strong>${commonHashes[hash]}</strong> (Found in common hash database)</p>`;
+            } else {
+                outputDiv.innerHTML += `<h3>❌ No match found in common hashes.</h3>`;
+            }
+        }
+
+        function checkWithUploadedDictionary() {
+            const fileInput = document.getElementById("wordlistFile").files[0];
+            const hash = document.getElementById("hashInput").value.trim();
+
+            if (!hash || !fileInput) {
+                alert("Please enter a hash and upload a dictionary file.");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const words = event.target.result.split("\n");
+                let matchFound = false;
+
+                words.forEach(word => {
+                    const wordTrimmed = word.trim();
+                    const generatedHash = CryptoJS.MD5(wordTrimmed).toString();
+                    if (generatedHash === hash) {
+                        document.getElementById("output").innerHTML += `<h3>✅ Match Found:</h3><p><strong>${wordTrimmed}</strong> (Matched from uploaded dictionary)</p>`;
+                        matchFound = true;
+                    }
+                });
+
+                if (!matchFound) {
+                    document.getElementById("output").innerHTML += `<h3>❌ No match found in dictionary.</h3>`;
+                }
+            };
+            reader.readAsText(fileInput);
+        }
+
+        function compareWithText() {
+            const hash = document.getElementById("hashInput").value.trim();
+            const text = document.getElementById("textInput").value.trim();
+            if (!hash || !text) {
+                alert("Please enter both a hash and text.");
+                return;
+            }
+
+            const generatedHash = CryptoJS.MD5(text).toString();
+            if (generatedHash === hash) {
+                document.getElementById("output").innerHTML += `<h3>✅ Matched Hash:</h3><p><strong>${text}</strong> is the original text.</p>`;
+            } else {
+                document.getElementById("output").innerHTML += `<h3>❌ No match found.</h3>`;
+            }
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steganography Tool with LSB Detection & Entropy Analysis</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code&display=swap');
+        
+        body {
+            font-family: 'Fira Code', monospace;
+            text-align: center;
+            padding: 20px;
+            background-color: #121212;
+            color: #00eaff;
+        }
+
+        h1 {
+            text-shadow: 0 0 10px #00eaff, 0 0 20px #0077ff;
+        }
+
+        input, button, textarea {
+            width: 80%;
+            padding: 10px;
+            background: #000;
+            color: #00ff00;
+            border: 2px solid #00eaff;
+            font-size: 16px;
+            font-family: 'Fira Code', monospace;
+            box-shadow: 0px 0px 10px #00eaff;
+            margin-bottom: 10px;
+        }
+
+        button {
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            box-shadow: 0 0 10px #00eaff;
+        }
+
+        #output {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.9);
+            display: inline-block;
+            border-radius: 10px;
+            box-shadow: 0px 0px 20px #00eaff;
+            text-align: left;
+            width: 80%;
+            word-wrap: break-word;
+        }
+
+        canvas {
+            display: none;
+            margin-top: 20px;
+            border: 2px solid #00eaff;
+        }
+
+        footer {
+            margin-top: 20px;
+            font-size: 14px;
+            text-shadow: 0 0 5px #00eaff;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Steganography Tool with LSB Detection & Entropy Analysis 🕵️‍♂️</h1>
+    
+    <h2>🔹 Hide a Secret Message</h2>
+    <input type="file" id="imageInput" accept="image/png, image/jpeg">
+    <br>
+    <textarea id="secretMessage" placeholder="Enter your secret message"></textarea>
+    <br>
+    <button onclick="hideMessage()">Embed Message in Image</button>
+    <br>
+    <a id="downloadLink" style="display: none;">Download Image</a>
+
+    <h2>🔍 Extract Hidden Message</h2>
+    <input type="file" id="stegoImageInput" accept="image/png, image/jpeg">
+    <br>
+    <button onclick="extractMessage()">Extract Hidden Message</button>
+
+    <h2>📊 Image Analysis</h2>
+    <input type="file" id="analyzeImageInput" accept="image/png, image/jpeg">
+    <br>
+    <button onclick="analyzeEntropy()">Analyze Entropy</button>
+    <button onclick="detectLSB()">Detect LSB Steganography</button>
+
+    <div id="output"></div>
+    <canvas id="canvas"></canvas>
+
+    <footer>
+        <p><strong>Disclaimer:</strong> This tool is for educational and cybersecurity research purposes only. 
+            Misuse of this tool for unethical activities is strictly prohibited. 
+            The creator assumes no responsibility for misuse.</p>
+    </footer>
+
+    <script>
+        function hideMessage() {
+            const fileInput = document.getElementById('imageInput').files[0];
+            const message = document.getElementById('secretMessage').value;
+            if (!fileInput || !message) {
+                alert("Please select an image and enter a message.");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.getElementById('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const pixels = imageData.data;
+                    
+                    let binaryMessage = "";
+                    for (let i = 0; i < message.length; i++) {
+                        let charBinary = message[i].charCodeAt(0).toString(2).padStart(8, '0');
+                        binaryMessage += charBinary;
+                    }
+                    binaryMessage += "00000000"; // Stop sequence
+
+                    for (let i = 0; i < binaryMessage.length; i++) {
+                        pixels[i * 4] = (pixels[i * 4] & 0xFE) | parseInt(binaryMessage[i]); 
+                    }
+
+                    ctx.putImageData(imageData, 0, 0);
+                    const stegoImage = canvas.toDataURL("image/png");
+
+                    const downloadLink = document.getElementById("downloadLink");
+                    downloadLink.href = stegoImage;
+                    downloadLink.download = "stego_image.png";
+                    downloadLink.innerText = "Download Steganographic Image";
+                    downloadLink.style.display = "block";
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(fileInput);
+        }
+
+        function extractMessage() {
+            const fileInput = document.getElementById('stegoImageInput').files[0];
+            if (!fileInput) {
+                alert("Please select a steganographic image.");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.getElementById('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const pixels = imageData.data;
+
+                    let binaryMessage = "";
+                    for (let i = 0; i < pixels.length; i += 4) {
+                        binaryMessage += (pixels[i] & 1).toString();
+                    }
+
+                    let extractedMessage = "";
+                    for (let i = 0; i < binaryMessage.length; i += 8) {
+                        let byte = binaryMessage.substr(i, 8);
+                        if (byte === "00000000") break;
+                        extractedMessage += String.fromCharCode(parseInt(byte, 2));
+                    }
+
+                    document.getElementById("output").innerHTML = `<h3>Extracted Message:</h3><pre>${extractedMessage}</pre>`;
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(fileInput);
+        }
+
+        function analyzeEntropy() {
+            const fileInput = document.getElementById('analyzeImageInput').files[0];
+            if (!fileInput) {
+                alert("Please select an image for entropy analysis.");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.getElementById('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const pixels = imageData.data;
+
+                    let freq = new Array(256).fill(0);
+                    for (let i = 0; i < pixels.length; i += 4) {
+                        freq[pixels[i]]++; // Count pixel intensity values
+                    }
+
+                    let entropy = 0;
+                    const totalPixels = pixels.length / 4;
+                    freq.forEach(count => {
+                        if (count > 0) {
+                            let probability = count / totalPixels;
+                            entropy -= probability * Math.log2(probability);
+                        }
+                    });
+
+                    document.getElementById("output").innerHTML = `<h3>Entropy Analysis:</h3>
+                        <p>Entropy Score: ${entropy.toFixed(4)} (Higher = Likely Steganography)</p>`;
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(fileInput);
+        }
+
+        function detectLSB() {
+    const fileInput = document.getElementById('analyzeImageInput').files[0];
+    if (!fileInput) {
+        alert("Please select an image to analyze.");
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        const img = new Image();
+        img.onload = function() {
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const pixels = imageData.data;
+
+            let lsbImage = ctx.createImageData(canvas.width, canvas.height);
+            let modifiedPixels = 0;
+
+            for (let i = 0; i < pixels.length; i += 4) {
+                let lsb = pixels[i] & 1; // Extract LSB of the Red Channel
+
+                if (lsb === 1) modifiedPixels++;
+
+                // Highlight LSB-modified pixels in white (255, 255, 255)
+                lsbImage.data[i] = lsb ? 255 : 0;   // Red Channel
+                lsbImage.data[i+1] = lsb ? 255 : 0; // Green Channel
+                lsbImage.data[i+2] = lsb ? 255 : 0; // Blue Channel
+                lsbImage.data[i+3] = 255;           // Alpha (fully visible)
+            }
+
+            ctx.putImageData(lsbImage, 0, 0);
+            canvas.style.display = "block";
+
+            document.getElementById("output").innerHTML = `
+                <h3>LSB Detection Analysis:</h3>
+                <p>${modifiedPixels} pixels may contain hidden data.</p>
+                <p>White areas in the visualization indicate possible steganography.</p>
+            `;
+        };
+        img.src = event.target.result;
+    };
+    reader.readAsDataURL(fileInput);
+}
+
+    </script>
+
+</body>
+</html>
