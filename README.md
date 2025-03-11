@@ -86,4 +86,4 @@ If you have any questions, concerns, or need clarification on the ethical use of
 ## **📜 LICENSE & USAGE TERMS**  
 - This repository is distributed **without any warranty** and is provided **as is**.  
 - By using this repository, you agree that **you are solely responsible for your actions**.  
-- **Any misuse of this repository is strictly prohibited.**  
+- **Any misuse of this repository is strictly prohibited.** 
