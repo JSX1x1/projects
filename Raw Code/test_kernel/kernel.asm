@@ -198,3 +198,36 @@ _Z11kernel_mainv:
 .L18:
     call    _Z11task_switchv        ; Switch between tasks
     jmp     .L18                    ; Repeat task switching
+
+global enter_usermode
+
+enter_usermode:
+    cli
+    push 0x23  ; User mode data segment
+    push esp   ; Stack pointer
+    pushf      ; EFLAGS
+    push 0x1B  ; User mode code segment
+    push user_main
+    iretq
+
+user_main:
+    mov eax, 1
+    int 0x80  ; Call sys_print("Hello from user mode")
+
+global syscall_handler
+extern handle_syscall
+
+syscall_handler:
+    pusha
+    call handle_syscall
+    popa
+    iret
+
+global pit_handler
+extern task_switch
+
+pit_handler:
+    pusha
+    call task_switch
+    popa
+    iret
