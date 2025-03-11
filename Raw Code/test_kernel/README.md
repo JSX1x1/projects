@@ -1,227 +1,204 @@
-Certainly! Below is a detailed README in Markdown format, explaining your assembly code and its components. You can use this for your GitHub project.
+# **🛠 Kernel Assembly & C Code Documentation**  
+
+This repository contains a **low-level operating system kernel**, written in **assembly and C**, with functions for **interrupt handling, memory allocation, task scheduling, input/output operations, system calls, and user-mode execution**.  
+
+This kernel is designed as an **educational project** to explore **operating system fundamentals**, including **hardware interaction, preemptive multitasking, and memory management**.  
 
 ---
 
-# Kernel Assembly Code Documentation
+## **📌 Features**  
 
-This repository contains a basic kernel written in assembly, with functions for interrupt handling, memory allocation, task scheduling, and input/output operations. It is a low-level operating system kernel that manages tasks and interacts with hardware via direct I/O operations.
-
-## Features
-
-- **Interrupt Handling**: The kernel handles interrupts by setting up an Interrupt Descriptor Table (IDT).
-- **Memory Management**: A simple memory allocation function that tracks heap usage.
-- **Task Scheduling**: A basic task switching mechanism that allows two tasks to run concurrently in a round-robin fashion.
-- **I/O Operations**: Functions for reading from and writing to I/O ports.
+✅ **Interrupt Handling** – Manages hardware interrupts using an **Interrupt Descriptor Table (IDT)**.  
+✅ **Memory Management** – Implements **basic heap allocation** and **paging support**.  
+✅ **Preemptive Multitasking** – Uses **PIT (Programmable Interval Timer) to trigger task switching**.  
+✅ **I/O Operations** – Read/write directly to **I/O ports** for hardware communication.  
+✅ **System Calls** – Provides a **syscall interface (int 0x80)** for user programs to access kernel functions.  
+✅ **User Mode Execution** – Runs user programs in **Ring 3**, enforcing **security and privilege separation**.  
 
 ---
 
-## Table of Contents
-
-1. [Introduction](#introduction)
-2. [File Structure](#file-structure)
-3. [Functions](#functions)
-   - [_Z4outbth](#z4outbth)
-   - [_Z3inbt](#z3inbt)
-   - [_Z6mallocm](#z6mallocm)
-   - [_Z11irq_handlerv](#z11irq_handlerv)
-   - [_Z12set_idt_gateim](#z12set_idt_gateim)
-   - [_Z8load_idtv](#z8load_idtv)
-   - [_Z11task_switchv](#z11task_switchv)
-   - [_Z11task_createPFvvE](#z11task_createPFvvE)
-   - [_Z5task1v](#z5task1v)
-   - [_Z5task2v](#z5task2v)
-   - [_Z11kernel_mainv](#z11kernel_mainv)
-4. [Compilation and Setup](#compilation-and-setup)
-5. [Usage](#usage)
-6. [License](#license)
-
----
-
-## Introduction
-
-This project is an assembly-based kernel that provides a simple environment for managing tasks and handling interrupts. It interacts directly with hardware via I/O port operations, manages a basic heap for memory allocation, and switches between two tasks using round-robin scheduling.
-
-This kernel is intended as an educational tool to understand how low-level kernel development works, especially focusing on assembly language and system programming concepts.
+## **📜 Table of Contents**  
+1. [Introduction](#introduction)  
+2. [File Structure](#file-structure)  
+3. [Functions](#functions)  
+   - [_Z4outbth](#z4outbth)  
+   - [_Z3inbt](#z3inbt)  
+   - [_Z6mallocm](#z6mallocm)  
+   - [_Z11irq_handlerv](#z11irq_handlerv)  
+   - [_Z12set_idt_gateim](#z12set_idt_gateim)  
+   - [_Z8load_idtv](#z8load_idtv)  
+   - [_Z11task_switchv](#z11task_switchv)  
+   - [_Z11task_createPFvvE](#z11task_createPFvvE)  
+   - [_Z11syscall_handler](#z11syscall_handler)  
+   - [_Z11enter_usermode](#z11enter_usermode)  
+   - [_Z5task1v](#z5task1v)  
+   - [_Z5task2v](#z5task2v)  
+   - [_Z11kernel_mainv](#z11kernel_mainv)  
+4. [Compilation and Setup](#compilation-and-setup)  
+5. [Usage](#usage)  
+6. [License](#license)  
 
 ---
 
-## File Structure
+## **📌 Introduction**  
 
+This project is an **assembly & C-based kernel** that provides a simple environment for:  
+- **Handling interrupts** (including exceptions and hardware IRQs).  
+- **Task switching** via preemptive multitasking using **PIT timer interrupts**.  
+- **Memory management** with **paging** and **basic heap allocation**.  
+- **System calls** to allow user programs to safely interact with the kernel.  
+- **Running user-mode programs in Ring 3**, enforcing privilege separation.  
+
+This kernel is an **educational tool** for understanding **low-level OS development**.  
+
+---
+
+## **📂 File Structure**  
 ```
 /project-root
-├── kernel.asm       # The main assembly code file containing the kernel functions
-├── Makefile         # Build instructions for compiling the kernel
+├── kernel.asm       # Core assembly functions (task switching, interrupts, syscalls)
+├── idt.c            # Interrupt Descriptor Table (IDT) setup
+├── pit.c            # Programmable Interval Timer (PIT) initialization
+├── paging.c         # Basic paging and virtual memory management
+├── syscall.c        # System call handling (int 0x80)
+├── io.h             # Inline assembly for I/O port access
+├── Makefile         # Build instructions
 └── README.md        # This documentation
 ```
 
 ---
 
-## Functions
+## **📜 Functions**  
 
-### `_Z4outbth`
-
-This function writes a byte to a specified I/O port.
-
-**Parameters:**
-- `edi`: The I/O port number (16-bit).
-- `esi`: The byte value to be written.
-
-**Operations:**
-- Stores the I/O port and data to the stack.
-- Writes the byte to the specified I/O port using the `outb` instruction.
+### **🔹 `_Z4outbth` (I/O Write)**
+- **Writes a byte to a specified I/O port** using `outb` instruction.  
+- Used for **hardware communication** (e.g., sending data to a PIC or PIT).  
 
 ---
 
-### `_Z3inbt`
-
-This function reads a byte from an I/O port.
-
-**Parameters:**
-- `edi`: The I/O port number (16-bit).
-
-**Operations:**
-- Reads a byte from the specified I/O port using the `inb` instruction.
-- Stores the byte read into a local variable.
+### **🔹 `_Z3inbt` (I/O Read)**
+- **Reads a byte from an I/O port** using `inb`.  
+- Used to **query hardware status**.  
 
 ---
 
-### `_Z6mallocm`
-
-A simple memory allocation function that provides memory from a heap.
-
-**Parameters:**
-- `rdi`: The requested size of memory.
-
-**Operations:**
-- Adds the requested memory size to the current heap pointer.
-- Checks if the total heap usage exceeds the 1MB limit.
-- Updates the global heap pointer and returns the allocated memory address.
+### **🔹 `_Z6mallocm` (Heap Allocation)**
+- Implements **basic memory allocation**.  
+- Tracks **heap usage** and returns allocated addresses.  
+- **Checks for memory overflows** (max **1MB heap**).  
 
 ---
 
-### `_Z11irq_handlerv`
-
-This is an example interrupt handler function for IRQ 32.
-
-**Operations:**
-- Outputs the IRQ number to an I/O port via the `outbth` function.
+### **🔹 `_Z11irq_handlerv` (IRQ Handler)**
+- Handles **IRQ 32** (Programmable Interval Timer).  
+- Calls `task_switch()` to **switch tasks preemptively**.  
 
 ---
 
-### `_Z12set_idt_gateim`
-
-Sets a gate in the Interrupt Descriptor Table (IDT) for handling interrupts.
-
-**Parameters:**
-- `edi`: The interrupt number (32-bit).
-- `rsi`: The address of the interrupt handler function (64-bit).
-
-**Operations:**
-- Stores the handler address in the appropriate entry in the IDT.
-- Sets flags and attributes for the interrupt gate.
+### **🔹 `_Z12set_idt_gateim` (Interrupt Setup)**
+- **Sets an entry** in the **Interrupt Descriptor Table (IDT)**.  
+- Registers **exception handlers, IRQs, and system calls**.  
 
 ---
 
-### `_Z8load_idtv`
-
-Loads the Interrupt Descriptor Table (IDT) into the processor.
-
-**Operations:**
-- Uses the `lidt` instruction to load the IDT from memory into the processor.
+### **🔹 `_Z8load_idtv` (Load IDT into CPU)**
+- Loads the **Interrupt Descriptor Table (IDT)** into the processor using `lidt`.  
 
 ---
 
-### `_Z11task_switchv`
-
-This function switches between tasks using a round-robin scheduler.
-
-**Operations:**
-- Loads the current task ID.
-- Adjusts the task ID to determine the next task.
-- Switches the stack pointer to the new task's stack.
+### **🔹 `_Z11task_switchv` (Task Switching)**
+- Implements **round-robin preemptive multitasking**.  
+- Saves & restores **register states** when switching between tasks.  
+- Uses **PIT timer (IRQ 0) to trigger automatic task switching**.  
 
 ---
 
-### `_Z11task_createPFvvE`
-
-This function creates a new task by setting up a task structure.
-
-**Parameters:**
-- `rdi`: A pointer to the function that the task will execute.
-
-**Operations:**
-- Allocates space for the new task.
-- Sets the function pointer and task-related data.
+### **🔹 `_Z11task_createPFvvE` (Task Creation)**
+- Creates a **new task** by allocating memory and setting up its stack.  
+- Adds the task to a **task queue** for scheduling.  
 
 ---
 
-### `_Z5task1v`
+### **🔹 `_Z11syscall_handler` (System Calls)**
+- Implements a **syscall handler (int 0x80)**.  
+- Maps **syscall numbers to kernel functions** (e.g., printing to console).  
 
-This is the first task that will run in an infinite loop.
-
-**Operations:**
-- Continuously outputs data to an I/O port.
-
----
-
-### `_Z5task2v`
-
-This is the second task that will run in an infinite loop.
-
-**Operations:**
-- Continuously outputs data to an I/O port.
-
----
-
-### `_Z11kernel_mainv`
-
-The main entry point of the kernel.
-
-**Operations:**
-- Sets up interrupt handling.
-- Creates two tasks (`task1` and `task2`).
-- Enters an infinite loop where tasks are switched using the `task_switchv` function.
+#### **📜 Example Syscall Code in C**
+```c
+void handle_syscall(uint32_t syscall_num, void *arg1) {
+    switch (syscall_num) {
+        case 1:
+            sys_print((char*)arg1);
+            break;
+        default:
+            break;
+    }
+}
+```
+- **Now, user programs can call syscalls using `int 0x80`!**  
 
 ---
 
-## Compilation and Setup
+### **🔹 `_Z11enter_usermode` (User Mode Execution)**
+- Switches execution **from Ring 0 (Kernel) to Ring 3 (User Mode)**.  
+- **Prepares a user-mode stack** before switching.  
 
-To compile and run the kernel, follow these steps:
+#### **📜 User Mode Entry (Assembly)**
+```assembly
+global enter_usermode
 
-1. Clone the repository:
-
-   ```bash
-   git clone https://github.com/JSX1x1/projects/tree/main/Raw%20Code/test_kernel.git
-   cd kernel-assembly
-   ```
-
-2. **Build the Kernel**:
-
-   The kernel can be built using a Makefile. To compile the code, run:
-
-   ```bash
-   make
-   ```
-
-   This will assemble the `kernel.asm` file into a binary that can be loaded onto a virtual machine or real hardware.
-
-3. **Running the Kernel**:
-
-   To test the kernel, you can use a virtual machine (e.g., QEMU) or an emulator. For example, to run the kernel using QEMU, use the following command:
-
-   ```bash
-   qemu-system-x86_64 -drive file=kernel.bin,format=raw
-   ```
+enter_usermode:
+    cli
+    push 0x23  ; User mode data segment
+    push 0x1000  ; User stack pointer
+    pushf      ; EFLAGS
+    push 0x1B  ; User mode code segment
+    push user_main
+    iretq
+```
+- **User programs now run safely in Ring 3!**  
 
 ---
 
-## Usage
-
-Once the kernel is running, it will perform the following tasks:
-
-- **Interrupt Handling**: IRQ 32 will trigger the interrupt handler.
-- **Task Scheduling**: The kernel will continuously switch between two tasks (`task1` and `task2`), which will output data to an I/O port.
+### **🔹 `_Z5task1v` / `_Z5task2v` (Example Tasks)**
+- **Demonstrates multitasking** by running infinite loops.  
 
 ---
 
-Feel free to fork, modify, or contribute to this project. If you have any questions or suggestions, feel free to open an issue or create a pull request!
+### **🔹 `_Z11kernel_mainv` (Kernel Entry Point)**
+- **Initializes interrupts, IDT, paging, and PIT**.  
+- **Creates multiple tasks**.  
+- **Switches to user mode**.  
+
+---
+
+## **⚙️ Compilation and Setup**  
+
+### **1️⃣ Clone the Repository**  
+```sh
+git clone https://github.com/JSX1x1/projects/tree/main/Raw%20Code/test_kernel.git
+cd test_kernel
+```
+
+### **2️⃣ Build the Kernel**  
+```sh
+make
+```
+
+### **3️⃣ Run the Kernel in QEMU**  
+```sh
+qemu-system-x86_64 -drive file=kernel.bin,format=raw
+```
+✔ **Now, the kernel will boot and run in QEMU!**  
+
+---
+
+## **📌 Usage**
+- **Kernel boots and sets up interrupts & memory**.  
+- **User programs run in Ring 3** with **syscall support**.  
+- **Multitasking is handled via PIT timer interrupts**.  
+
+---
+
+## **📜 License**
+This project is open-source and provided **for educational purposes only**.  
