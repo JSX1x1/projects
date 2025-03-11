@@ -7,11 +7,11 @@
 
 void init_pit(uint32_t frequency) {
     uint32_t divisor = 1193180 / frequency;
-
-    outb(PIT_COMMAND, 0x36); // Set PIT to mode 3 (square wave generator)
-    outb(PIT_CHANNEL0, (uint8_t)(divisor & 0xFF)); // Low byte
-    outb(PIT_CHANNEL0, (uint8_t)((divisor >> 8) & 0xFF)); // High byte
+    outb(0x43, 0x36);
+    outb(0x40, (uint8_t)(divisor & 0xFF));
+    outb(0x40, (uint8_t)((divisor >> 8) & 0xFF));
 }
+
 
 extern void pit_handler();
 

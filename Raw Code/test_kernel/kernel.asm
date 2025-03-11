@@ -204,7 +204,7 @@ global enter_usermode
 enter_usermode:
     cli
     push 0x23  ; User mode data segment
-    push esp   ; Stack pointer
+    push 0x1000  ; User stack pointer
     pushf      ; EFLAGS
     push 0x1B  ; User mode code segment
     push user_main
@@ -219,15 +219,33 @@ extern handle_syscall
 
 syscall_handler:
     pusha
+    mov eax, [esp+36] ; Read syscall number
     call handle_syscall
     popa
     iret
 
-global pit_handler
-extern task_switch
 
-pit_handler:
-    pusha
-    call task_switch
-    popa
-    iret
+global task_switch
+extern current_task
+extern tasks
+
+task_switch:
+    cli
+    pusha                     ; Save registers
+    mov eax, current_task
+    mov [tasks + eax * 4], esp ; Save stack pointer
+
+    add eax, 1                ; Switch to next task
+    mov current_task, eax
+    mov eax, [tasks + eax * 4] ; Load new task's stack pointer
+    mov esp, eax
+    popa                      ; Restore registers
+    sti
+    ret
+
+global load_idt
+extern idt_descriptor
+
+load_idt:
+    lidt [idt_descriptor]  ; Load IDT
+    ret
