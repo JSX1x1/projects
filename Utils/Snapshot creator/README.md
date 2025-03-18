@@ -1,14 +1,3 @@
-Here's a **fully professional README** for your tool, covering both the GUI and CLI versions. It includes:  
-
-✅ **Project Overview**  
-✅ **Features**  
-✅ **Installation** (step-by-step)  
-✅ **Usage Instructions** (GUI & CLI)  
-✅ **Technical Details**  
-✅ **Future Improvements**  
-
----
-
 ## **📌 Snapshot Creator - GUI & CLI**  
 A powerful tool for creating compressed snapshots of directories, analyzing file corruption risks, and excluding unnecessary files.  
 
