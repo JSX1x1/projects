@@ -1,3 +1,5 @@
+// This function provides multiple sections of different save typed that can be used and modified dynamically
+
 function save_to_localstorage() {
     // [Single Value Safe] - Save individual key-value pair
     // Remove this section if not needed
@@ -38,3 +40,15 @@ function save_to_localstorage() {
 
 // Call the function to save placeholder data
 save_to_localstorage();
+
+
+// This function is used to clear the localstorage completly from all elements.
+// If certain elements are wanted to be removed the code needs to be adjusted to the right params.
+
+function clear_localstorage() {
+    localStorage.clear(); // Clears all data
+    console.log("LocalStorage has been cleared.");
+}
+
+// Call when necessary
+clear_localstorage();
