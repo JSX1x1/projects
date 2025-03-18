@@ -115,7 +115,7 @@ Currently, the `utils/client/` folder **does not contain any tools**. However, i
 ---
 
 # **🚀 Conclusion**  
-The **Client Path** (`utils/client/`) is intended as a structured location for **client monitoring, management, and automation scripts**. While currently empty, it will serve as the foundation for future **secure and ethical** client utilities.  
+The **Client Path** (`utils/client/`) is intended as a structured location for **client monitoring, management, and automation scripts**. While currently under development, it will serve as the foundation for future **secure and ethical** client utilities.  
 
 ✅ **Use it for:**  
 ✔️ System monitoring & troubleshooting  
