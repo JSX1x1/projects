@@ -61,7 +61,7 @@ pip install PyQt6
 ### **3️⃣ Download the Scripts**  
 Clone this repository or manually download the scripts:  
 ```bash
-git clone https://github.com/your-repo/snapshot-creator.git
+git clone https://github.com/JSX1x1/projects/tree/main/Utils/Snapshot%20creator
 cd snapshot-creator
 ```
 
