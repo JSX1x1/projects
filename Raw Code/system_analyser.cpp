@@ -6,7 +6,6 @@
 #include <thread>
 #include <chrono>
 #include <iomanip>
-#include <filesystem>
 
 #ifdef _WIN32
     #include <windows.h>
@@ -19,31 +18,30 @@
     #include <unistd.h>
 #endif
 
+#if __cplusplus >= 201703L  // Check if C++17 is supported
+    #include <filesystem>
+    namespace fs = std::filesystem;
+#else
+    #error "C++17 or newer is required for std::filesystem"
+#endif
+
 using namespace std;
-namespace fs = std::filesystem;
-
-// File for logging system information
-ofstream logFile("system_report.txt");
-
-void log(const string& text) {
-    cout << text << endl;
-    logFile << text << endl;
-}
 
 // Get CPU Information
 void getCPUInfo() {
-    log("\n🔍 Fetching CPU Information...");
+    cout << "\n🔍 Fetching CPU Information...\n";
     
     #ifdef _WIN32
     SYSTEM_INFO sysInfo;
     GetSystemInfo(&sysInfo);
-    log("🔹 Number of Cores: " + to_string(sysInfo.dwNumberOfProcessors));
-
+    
+    cout << "🔹 Number of Cores: " << sysInfo.dwNumberOfProcessors << "\n";
+    
     char cpuBrand[256];
     DWORD size = sizeof(cpuBrand);
     if (RegGetValueA(HKEY_LOCAL_MACHINE, "HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0",
                      "ProcessorNameString", RRF_RT_REG_SZ, nullptr, &cpuBrand, &size) == ERROR_SUCCESS) {
-        log("🔹 Processor: " + string(cpuBrand));
+        cout << "🔹 Processor: " << cpuBrand << "\n";
     }
     
     #elif __linux__
@@ -51,7 +49,7 @@ void getCPUInfo() {
     string line;
     while (getline(cpuinfo, line)) {
         if (line.find("model name") != string::npos) {
-            log("🔹 " + line);
+            cout << "🔹 " << line << "\n";
             break;
         }
     }
@@ -60,82 +58,79 @@ void getCPUInfo() {
 
 // Get RAM Information
 void getMemoryInfo() {
-    log("\n🖥️ Fetching Memory Information...");
+    cout << "\n🖥️ Fetching Memory Information...\n";
     
     #ifdef _WIN32
     MEMORYSTATUSEX memInfo;
     memInfo.dwLength = sizeof(MEMORYSTATUSEX);
     GlobalMemoryStatusEx(&memInfo);
     
-    log("🔹 Total RAM:      " + to_string(memInfo.ullTotalPhys / (1024 * 1024)) + " MB");
-    log("🔹 Available RAM:  " + to_string(memInfo.ullAvailPhys / (1024 * 1024)) + " MB");
+    cout << "🔹 Total RAM: " << memInfo.ullTotalPhys / (1024 * 1024) << " MB\n";
+    cout << "🔹 Available RAM: " << memInfo.ullAvailPhys / (1024 * 1024) << " MB\n";
     
     #elif __linux__
     struct sysinfo memInfo;
     sysinfo(&memInfo);
     
-    log("🔹 Total RAM:      " + to_string(memInfo.totalram / (1024 * 1024)) + " MB");
-    log("🔹 Free RAM:       " + to_string(memInfo.freeram / (1024 * 1024)) + " MB");
+    cout << "🔹 Total RAM: " << memInfo.totalram / (1024 * 1024) << " MB\n";
+    cout << "🔹 Free RAM: " << memInfo.freeram / (1024 * 1024) << " MB\n";
     #endif
 }
 
-// Get Disk Information using C++17 filesystem
+// Get Disk Information
 void getDiskInfo() {
-    log("\n💾 Fetching Disk Information...");
+    cout << "\n💾 Fetching Disk Information...\n";
+
     try {
-        fs::space_info diskSpace = fs::space("/");
-        log("🔹 Total Space:    " + to_string(diskSpace.capacity / (1024 * 1024 * 1024)) + " GB");
-        log("🔹 Free Space:     " + to_string(diskSpace.free / (1024 * 1024 * 1024)) + " GB");
-    } catch (exception& e) {
-        log("❌ Error fetching disk info: " + string(e.what()));
+        fs::space_info diskSpace = fs::space("."); // Use current drive
+        cout << "🔹 Total Disk Space: " << diskSpace.capacity / (1024 * 1024 * 1024) << " GB\n";
+        cout << "🔹 Free Space: " << diskSpace.free / (1024 * 1024 * 1024) << " GB\n";
+    } catch (const exception& e) {
+        cerr << "❌ Error fetching disk info: " << e.what() << "\n";
     }
 }
 
 // Get Network Information
 void getNetworkInfo() {
-    log("\n🌐 Fetching Network Information...");
+    cout << "\n🌐 Fetching Network Information...\n";
     
     #ifdef _WIN32
     ULONG bufferSize = 15000;
     PIP_ADAPTER_INFO adapterInfo = (PIP_ADAPTER_INFO)malloc(bufferSize);
     if (GetAdaptersInfo(adapterInfo, &bufferSize) == ERROR_SUCCESS) {
         while (adapterInfo) {
-            log("🔹 Adapter:       " + string(adapterInfo->Description));
-            log("🔹 IP Address:    " + string(adapterInfo->IpAddressList.IpAddress.String));
-            log("🔹 MAC Address:   ");
+            cout << "🔹 Adapter: " << adapterInfo->Description << "\n";
+            cout << "🔹 IP Address: " << adapterInfo->IpAddressList.IpAddress.String << "\n";
+            cout << "🔹 MAC Address: ";
             for (UINT i = 0; i < adapterInfo->AddressLength; i++) {
                 printf("%02X ", adapterInfo->Address[i]);
             }
-            log("\n");
+            cout << "\n";
             adapterInfo = adapterInfo->Next;
         }
     }
     free(adapterInfo);
     
     #elif __linux__
-    log("🔹 Active Network Interfaces & IPs:");
-    system("ip -o -4 addr show | awk '{print $2 \" -> \" $4}'");
+    system("ip -4 addr show | grep 'inet '");
     #endif
 }
 
-// Get Running Processes (Improved)
+// Get Running Processes
 void getProcessList() {
-    log("\n🔄 Fetching Running Processes...");
+    cout << "\n🔄 Fetching Running Processes...\n";
     
     #ifdef _WIN32
     DWORD processes[1024], processCount;
     if (EnumProcesses(processes, sizeof(processes), &processCount)) {
         processCount /= sizeof(DWORD);
-        for (unsigned int i = 0; i < min(processCount, 10U); i++) { // Limit to top 10 processes
+        for (unsigned int i = 0; i < processCount; i++) {
             if (processes[i] != 0) {
                 HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, processes[i]);
                 if (hProcess) {
                     char processName[MAX_PATH];
-                    PROCESS_MEMORY_COUNTERS pmc;
-                    if (GetModuleBaseName(hProcess, nullptr, processName, sizeof(processName)) &&
-                        GetProcessMemoryInfo(hProcess, &pmc, sizeof(pmc))) {
-                        log("🔹 PID: " + to_string(processes[i]) + " | Process: " + processName + 
-                            " | Memory Usage: " + to_string(pmc.WorkingSetSize / (1024 * 1024)) + " MB");
+                    if (GetModuleBaseName(hProcess, nullptr, processName, sizeof(processName))) {
+                        cout << "🔹 PID: " << processes[i] << " | Process: " << processName << "\n";
                     }
                     CloseHandle(hProcess);
                 }
@@ -144,48 +139,36 @@ void getProcessList() {
     }
     
     #elif __linux__
-    log("🔹 Top Processes (CPU & Memory Usage):");
-    system("top -b -n 1 | head -15");
+    system("ps -eo pid,comm,%mem --sort=-%mem | head -10");
     #endif
 }
 
 // Get System Uptime
 void getSystemUptime() {
-    log("\n⏳ Fetching System Uptime...");
+    cout << "\n⏳ Fetching System Uptime...\n";
     
     #ifdef _WIN32
     ULONGLONG uptime = GetTickCount64() / 1000;
-    log("🔹 Uptime: " + to_string(uptime / 3600) + " hours " + to_string((uptime % 3600) / 60) + " minutes");
+    cout << "🔹 Uptime: " << uptime / 3600 << " hours " << (uptime % 3600) / 60 << " minutes\n";
     
     #elif __linux__
     struct sysinfo info;
     sysinfo(&info);
-    log("🔹 Uptime: " + to_string(info.uptime / 3600) + " hours " + to_string((info.uptime % 3600) / 60) + " minutes");
+    cout << "🔹 Uptime: " << info.uptime / 3600 << " hours " << (info.uptime % 3600) / 60 << " minutes\n";
     #endif
 }
 
-// Main Function with Multithreading
 int main() {
     cout << "🛠️ Advanced System Analysis Tool 🛠️\n";
     cout << "----------------------------------\n";
 
-    // Run all system checks in parallel
-    thread t1(getCPUInfo);
-    thread t2(getMemoryInfo);
-    thread t3(getDiskInfo);
-    thread t4(getNetworkInfo);
-    thread t5(getProcessList);
-    thread t6(getSystemUptime);
+    getCPUInfo();
+    getMemoryInfo();
+    getDiskInfo();
+    getNetworkInfo();
+    getProcessList();
+    getSystemUptime();
 
-    // Wait for all threads to finish
-    t1.join();
-    t2.join();
-    t3.join();
-    t4.join();
-    t5.join();
-    t6.join();
-
-    log("\n✅ System Analysis Complete! Report saved as 'system_report.txt'.");
-    logFile.close();
+    cout << "\n✅ System Analysis Complete!\n";
     return 0;
 }
