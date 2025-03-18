@@ -1,13 +1,4 @@
-Sure! Below is a **professional README** with a structured expert layout. It includes sections for installation, usage, features, and contribution guidelines.
-
----
-
-### **📄 README.md - File Integrity Checker (GUI & CLI)**
-
-# **🔍 File Integrity Checker**
-*A comprehensive file integrity and security analysis tool with both GUI and CLI interfaces.*
-
-![PyQt6 GUI Screenshot](docs/gui_screenshot.png) *(Example screenshot of GUI version)*
+# **File Integrity Checker**
 
 ---
 
@@ -137,7 +128,7 @@ Submit a **pull request** or open a discussion if you'd like to add new features
 ### **🔧 Development Setup**
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/FileIntegrityChecker.git
+   git clone https://github.com/JSX1x1/projects/tree/main/Utils/Client/File%20integrity%20check
    ```
 2. Navigate to the project directory:
    ```bash
