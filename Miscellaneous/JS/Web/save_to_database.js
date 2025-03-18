@@ -127,3 +127,47 @@ async function delete_from_database() {
 
 // Call the function to delete data
 delete_from_database();
+
+
+
+// NOTE: THIS FUNCTION IS A BACKEND EXAMPLE WITH MULTIPLE USAGE SECTIONS
+const express = require("express");
+const app = express();
+app.use(express.json());
+
+const mockDB = {}; // Simulated in-memory database
+
+app.post("/api/save-single", (req, res) => {
+    mockDB[req.body.key] = req.body.value;
+    res.json({ message: "Saved successfully", data: req.body });
+});
+
+app.post("/api/save-multiple", (req, res) => {
+    Object.assign(mockDB, req.body);
+    res.json({ message: "Multiple values saved", data: req.body });
+});
+
+app.post("/api/save-json", (req, res) => {
+    mockDB["user_profile"] = req.body;
+    res.json({ message: "JSON saved", data: req.body });
+});
+
+app.get("/api/get-single", (req, res) => {
+    res.json({ value: mockDB[req.query.key] });
+});
+
+app.get("/api/get-multiple", (req, res) => {
+    res.json(mockDB);
+});
+
+app.put("/api/update", (req, res) => {
+    mockDB[req.body.key] = req.body.newValue;
+    res.json({ message: "Updated successfully", data: req.body });
+});
+
+app.delete("/api/delete", (req, res) => {
+    delete mockDB[req.body.key];
+    res.json({ message: "Deleted successfully" });
+});
+
+app.listen(3000, () => console.log("Server running on port 3000"));
