@@ -1,7 +1,3 @@
-Here’s a **detailed and professional README** for your `DLL_TEMPLATES` repository.  
-
----
-
 # DLL_TEMPLATES  
 
 ## ⚠ Disclaimer  
