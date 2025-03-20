@@ -1,24 +1,37 @@
-## Brute Force Emulator – Educational Simulation  
-*A PyQt6-based GUI to visualize how brute-force attacks work*  
+# Brute Force Emulator – Educational Simulation  
+*A PyQt6-based GUI & C# Console Simulation of Brute-Force Attacks*  
 
-### 🚀 **Overview**  
-This project is an **educational tool** designed to **simulate** how brute-force attacks work in password cracking. It does **not** perform actual attacks on any real systems or networks. Instead, it visually represents the process using **PyQt6** to help cybersecurity enthusiasts, students, and researchers understand brute-force mechanics.  
+---
+
+## 🚀 **Overview**  
+This project is an **educational tool** designed to **simulate** how brute-force attacks work in password cracking. It does **not** perform actual attacks on any real systems or networks. Instead, it visually represents the process using **PyQt6 (GUI)** and **C# Console Application** to help cybersecurity enthusiasts, students, and researchers understand brute-force mechanics.  
+
+> ⚠️ **This project is for learning purposes only. Misuse is strictly prohibited.**  
+> NOTE: THIS PROGRAMM DOES NOT ACTUALLY ATTEMPT BRUTEFORCE
 
 ---
 
 ## 📜 **How It Works**  
+
 ### 🎯 **Concept**  
 Brute-force attacks involve **systematically guessing** a password until the correct one is found. This program demonstrates this **without targeting any real accounts**.  
 
-### 🖥 **How the Code Works**  
+- **PyQt6 Version (GUI)**: Provides a **visual representation** of brute-force attempts.  
+- **C# Console Version**: Simulates the attack process in a **text-based format**.  
 
-1. **User sets a password** (which the emulator will attempt to "crack").  
-2. **The emulator starts guessing** using a **dictionary-based** or **incremental** approach.  
-3. **Each guess is displayed in real-time** inside a PyQt6 GUI.  
-4. **When the correct password is found**, the program stops and displays success.  
+Both versions work by:  
+1. **User setting a target password**.  
+2. **The emulator simulating password guessing**.  
+3. **Each guess being displayed in real-time**.  
+4. **Stopping when the correct password is found**.  
 
-### 🔍 **Code Breakdown**  
+---
 
+## 💻 **Code Explanations**  
+
+### 🖥 **Python (PyQt6 GUI Version)**  
+
+#### 🔍 **Brute Force Attack Logic**  
 ```python
 # Brute force function (simulates guessing passwords)
 def brute_force_attack(target_password, char_set, max_length):
@@ -29,14 +42,43 @@ def brute_force_attack(target_password, char_set, max_length):
             if guessed_password == target_password:
                 return guessed_password  # Password found!
 ```
-- **`itertools.product`** generates all possible combinations.  
-- **`update_gui_with_attempt(guessed_password)`** updates the GUI with each guess.  
-- **Stops when the correct password is found.**  
+- **`itertools.product`** generates all possible password combinations.  
+- **`update_gui_with_attempt(guessed_password)`** updates the GUI in real-time.  
+- **Stops when the correct password is found**.  
+
+---
+
+### 🖥 **C# Console Version**  
+
+#### 🔍 **Brute Force Attack Logic**  
+```csharp
+static string BruteForceAttack(string target, string charSet, int maxLength)
+{
+    foreach (int length in Enumerable.Range(1, maxLength))
+    {
+        foreach (var guess in GenerateCombinations(charSet, length))
+        {
+            Console.Write($"\rTrying: {guess}  "); // Update console with current guess
+            Thread.Sleep(10); // Simulate realistic processing delay
+
+            if (guess == target)
+            {
+                return guess; // Password matched!
+            }
+        }
+    }
+    return null;
+}
+```
+- **Uses recursive combinations** to generate password guesses.  
+- **Simulates real-time brute-force attacks in the console**.  
+- **Stops once the password is found**.  
 
 ---
 
 ## 📖 **How to Use**  
-### 🔧 **Installation & Setup**  
+
+### 🔧 **Python (PyQt6 GUI Version)**  
 
 #### **Step 1: Install Python**  
 Ensure you have Python **3.8+** installed. If not, download it from [python.org](https://www.python.org/).  
@@ -52,6 +94,25 @@ Download the script and run:
 ```sh
 python brute_force_emulator.py
 ```
+
+---
+
+### 🔧 **C# Console Version**  
+
+#### **Step 1: Install .NET SDK**  
+Ensure you have **.NET 6.0+** installed. Download it from [dotnet.microsoft.com](https://dotnet.microsoft.com/en-us/download).  
+
+#### **Step 2: Compile & Run**  
+1. Save the C# script as **`BruteForceEmulator.cs`**  
+2. Open a terminal or command prompt and navigate to the file location.  
+3. Compile the program:  
+   ```sh
+   dotnet build
+   ```
+4. Run the application:  
+   ```sh
+   dotnet run
+   ```
 
 ---
 
