@@ -1,6 +1,6 @@
 # **📌 Tools Collection – General README**  
 
-Welcome to this **Utils directory**! This path contains various **GUI and CLI-based tools** designed for different purposes. However, **not every tool has both a GUI and CLI version** for the following reasons:  
+Welcome to this **Utils/Client directory**! This path contains various **GUI and CLI-based tools** designed for different purposes. However, **not every tool has both a GUI and CLI version** for the following reasons:  
 
 ---
 
