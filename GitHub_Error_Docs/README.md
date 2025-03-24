@@ -4,13 +4,13 @@
 
 **GitHub Error Docs** is a collection of **clear, structured, and easy-to-follow troubleshooting guides** for resolving common Git and GitHub errors efficiently.  
 
-### **🔹 How to Use This Repository**  
+### **🔹 How to Use This Directory**  
 1. **Find the error** you are encountering in the documentation.  
 2. **Follow the step-by-step solution** to resolve it.  
 3. **Apply the recommended best practices** to prevent the issue from happening again.  
 4. **If the problem persists, troubleshoot further** or open an issue for discussion.  
 
-💡 **This repository is designed for quick, no-nonsense fixes** to ensure a **smooth Git workflow** with minimal downtime.  
+💡 **This path is designed for quick, no-nonsense fixes** to ensure a **smooth Git workflow** with minimal downtime.  
 
 ---
 
