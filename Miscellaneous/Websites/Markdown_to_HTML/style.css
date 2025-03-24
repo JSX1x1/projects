@@ -1,0 +1,39 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f7f6;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.file-input {
+    padding: 10px;
+    margin: 20px 0;
+    display: block;
+    font-size: 16px;
+}
+
+.output {
+    border: 1px solid #ddd;
+    padding: 20px;
+    min-height: 200px;
+    margin-top: 20px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+footer {
+    text-align: center;
+    margin-top: 40px;
+    color: #888;
+}

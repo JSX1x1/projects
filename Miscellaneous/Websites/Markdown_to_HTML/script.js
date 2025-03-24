@@ -6,7 +6,7 @@ const outputArea = document.getElementById('output');
 fileInput.addEventListener('change', (event) => {
     const file = event.target.files[0];
     
-    if (file && file.type === 'text/markdown' || file.name.endsWith('.md')) {
+    if (file && (file.name.endsWith('.md') || file.name.endsWith('.markdown'))) {
         const reader = new FileReader();
         
         reader.onload = function(e) {
