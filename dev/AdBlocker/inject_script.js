@@ -13,7 +13,7 @@
     // Instantly stop if redirected
     const stopImmediateRedirect = () => {
         config.blockedPrefixes.forEach((prefix) => {
-            if (window.location.href.startsWith(prefix)) {
+            if (window.location.href.startsWith(prefix)) {+
                 console.log("Blocked immediate redirect to: " + window.location.href);
                 window.stop();
                 document.documentElement.innerHTML = "<h1>Redirect Blocked</h1>";
