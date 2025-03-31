@@ -77,21 +77,39 @@ NTSTATUS IoctlDispatch(PDEVICE_OBJECT DeviceObject, PIRP Irp) {
 
     switch (IoControlCode) {
         case IOCTL_SEND_DATA:
-            if (IoStackLocation->Parameters.DeviceIoControl.InputBufferLength > 0) {
-                RtlCopyMemory(GlobalBuffer, Irp->AssociatedIrp.SystemBuffer, IoStackLocation->Parameters.DeviceIoControl.InputBufferLength);
-                GlobalBuffer[IoStackLocation->Parameters.DeviceIoControl.InputBufferLength] = '\0';
-                DbgPrint("[Driver] Received data: %s\n", GlobalBuffer);
-                Status = STATUS_SUCCESS;
+            // Input validation: Ensure the buffer size is valid
+            if (IoStackLocation->Parameters.DeviceIoControl.InputBufferLength == 0) {
+                DbgPrint("[Driver] Invalid input data size\n");
+                Status = STATUS_INVALID_PARAMETER;
+                break;
             }
+            
+            if (IoStackLocation->Parameters.DeviceIoControl.InputBufferLength > sizeof(GlobalBuffer) - 1) {
+                DbgPrint("[Driver] Input data size exceeds buffer size\n");
+                Status = STATUS_BUFFER_TOO_SMALL;
+                break;
+            }
+
+            // Copy the data from the user-mode buffer to the kernel buffer
+            RtlCopyMemory(GlobalBuffer, Irp->AssociatedIrp.SystemBuffer, IoStackLocation->Parameters.DeviceIoControl.InputBufferLength);
+            GlobalBuffer[IoStackLocation->Parameters.DeviceIoControl.InputBufferLength] = '\0';  // Null-terminate the string
+            DbgPrint("[Driver] Received data: %s\n", GlobalBuffer);
+            Status = STATUS_SUCCESS;
             break;
 
         case IOCTL_GET_DATA:
-            if (IoStackLocation->Parameters.DeviceIoControl.OutputBufferLength >= sizeof(GlobalBuffer)) {
-                RtlCopyMemory(Irp->AssociatedIrp.SystemBuffer, GlobalBuffer, sizeof(GlobalBuffer));
-                Irp->IoStatus.Information = sizeof(GlobalBuffer);
-                DbgPrint("[Driver] Sent data: %s\n", GlobalBuffer);
-                Status = STATUS_SUCCESS;
+            // Output validation: Ensure the user buffer can hold the data
+            if (IoStackLocation->Parameters.DeviceIoControl.OutputBufferLength < sizeof(GlobalBuffer)) {
+                DbgPrint("[Driver] Output buffer size is too small\n");
+                Status = STATUS_BUFFER_TOO_SMALL;
+                break;
             }
+
+            // Copy the data from the kernel buffer to the user-mode buffer
+            RtlCopyMemory(Irp->AssociatedIrp.SystemBuffer, GlobalBuffer, sizeof(GlobalBuffer));
+            Irp->IoStatus.Information = sizeof(GlobalBuffer);
+            DbgPrint("[Driver] Sent data: %s\n", GlobalBuffer);
+            Status = STATUS_SUCCESS;
             break;
 
         default:

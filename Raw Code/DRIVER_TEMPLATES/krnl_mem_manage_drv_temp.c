@@ -15,30 +15,40 @@ typedef struct _MEMORY_REQUEST {
 
 PVOID g_AllocatedMemory = NULL;  // Global allocated memory pointer
 
+// Allocate memory in the kernel space
 NTSTATUS AllocateKernelMemory(PIRP Irp, PIO_STACK_LOCATION Stack) {
     SIZE_T size = *(SIZE_T*)Irp->AssociatedIrp.SystemBuffer;
 
-    if (size > 0 && size <= PAGE_SIZE) {  // Restrict large allocations
-        g_AllocatedMemory = ExAllocatePool2(POOL_FLAG_NON_PAGED, size, 'MemD');
-        if (g_AllocatedMemory) {
-            RtlZeroMemory(g_AllocatedMemory, size);
-            KdPrint(("Allocated %llu bytes at %p\n", size, g_AllocatedMemory));
-            return STATUS_SUCCESS;
-        }
+    // Validate the allocation size
+    if (size == 0 || size > PAGE_SIZE) {  // Restrict large allocations
+        DbgPrint("[MemoryManager] Invalid allocation size: %llu\n", size);
+        return STATUS_INVALID_PARAMETER;
     }
-    return STATUS_INSUFFICIENT_RESOURCES;
+
+    g_AllocatedMemory = ExAllocatePool2(POOL_FLAG_NON_PAGED, size, 'MemD');
+    if (g_AllocatedMemory) {
+        RtlZeroMemory(g_AllocatedMemory, size);
+        DbgPrint("[MemoryManager] Allocated %llu bytes at %p\n", size, g_AllocatedMemory);
+        return STATUS_SUCCESS;
+    } else {
+        DbgPrint("[MemoryManager] Failed to allocate memory\n");
+        return STATUS_INSUFFICIENT_RESOURCES;
+    }
 }
 
+// Free previously allocated kernel memory
 NTSTATUS FreeKernelMemory() {
     if (g_AllocatedMemory) {
         ExFreePoolWithTag(g_AllocatedMemory, 'MemD');
         g_AllocatedMemory = NULL;
-        KdPrint(("Kernel memory freed.\n"));
+        DbgPrint("[MemoryManager] Kernel memory freed\n");
         return STATUS_SUCCESS;
     }
+    DbgPrint("[MemoryManager] No memory to free\n");
     return STATUS_UNSUCCESSFUL;
 }
 
+// Read memory from another process
 NTSTATUS ReadProcessMemory(PIRP Irp, PIO_STACK_LOCATION Stack) {
     PMEMORY_REQUEST request = (PMEMORY_REQUEST)Irp->AssociatedIrp.SystemBuffer;
     PEPROCESS targetProcess;
@@ -50,10 +60,19 @@ NTSTATUS ReadProcessMemory(PIRP Irp, PIO_STACK_LOCATION Stack) {
                                      PsGetCurrentProcess(), (PVOID)request->Size,
                                      request->Size, KernelMode, &bytesRead);
         ObDereferenceObject(targetProcess);
+        if (NT_SUCCESS(status)) {
+            DbgPrint("[MemoryManager] Read %llu bytes from process %p\n", bytesRead, targetProcess);
+        } else {
+            DbgPrint("[MemoryManager] Failed to read from process memory\n");
+        }
+    } else {
+        DbgPrint("[MemoryManager] Failed to lookup process with ID %p\n", (HANDLE)request->Address);
     }
+
     return status;
 }
 
+// Write memory to another process
 NTSTATUS WriteProcessMemory(PIRP Irp, PIO_STACK_LOCATION Stack) {
     PMEMORY_REQUEST request = (PMEMORY_REQUEST)Irp->AssociatedIrp.SystemBuffer;
     PEPROCESS targetProcess;
@@ -65,10 +84,19 @@ NTSTATUS WriteProcessMemory(PIRP Irp, PIO_STACK_LOCATION Stack) {
                                      targetProcess, (PVOID)request->Address,
                                      request->Size, KernelMode, &bytesWritten);
         ObDereferenceObject(targetProcess);
+        if (NT_SUCCESS(status)) {
+            DbgPrint("[MemoryManager] Wrote %llu bytes to process %p\n", bytesWritten, targetProcess);
+        } else {
+            DbgPrint("[MemoryManager] Failed to write to process memory\n");
+        }
+    } else {
+        DbgPrint("[MemoryManager] Failed to lookup process with ID %p\n", (HANDLE)request->Address);
     }
+
     return status;
 }
 
+// Handle IOCTL requests
 NTSTATUS IoctlHandler(PDEVICE_OBJECT DeviceObject, PIRP Irp) {
     PIO_STACK_LOCATION stack = IoGetCurrentIrpStackLocation(Irp);
     NTSTATUS status = STATUS_INVALID_PARAMETER;
@@ -86,14 +114,18 @@ NTSTATUS IoctlHandler(PDEVICE_OBJECT DeviceObject, PIRP Irp) {
         case IOCTL_WRITE_PROCESS_MEMORY:
             status = WriteProcessMemory(Irp, stack);
             break;
+        default:
+            DbgPrint("[MemoryManager] Unknown IOCTL code: %lu\n", stack->Parameters.DeviceIoControl.IoControlCode);
+            break;
     }
-    
+
     Irp->IoStatus.Status = status;
     Irp->IoStatus.Information = 0;
     IoCompleteRequest(Irp, IO_NO_INCREMENT);
     return status;
 }
 
+// Driver entry point
 NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath) {
     UNICODE_STRING devName = RTL_CONSTANT_STRING(DEVICE_NAME);
     UNICODE_STRING symLink = RTL_CONSTANT_STRING(SYMBOLIC_LINK_NAME);
@@ -113,5 +145,6 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath) 
         IoDeleteDevice(obj->DeviceObject);
     };
 
+    DbgPrint("[MemoryManager] Driver loaded successfully\n");
     return STATUS_SUCCESS;
 }
