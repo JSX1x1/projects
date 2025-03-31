@@ -35,6 +35,8 @@ Not every tool in this directory has its **own README**. Before running any scri
   myenv\Scripts\activate  # Windows
   ```  
 
+Some libraries included in requirements.txt might not be required for your specific use case. To keep your environment minimal, consider manually installing only the dependencies you need.
+
 ---
 
 ## **⚠️ Safety Guidelines**  
