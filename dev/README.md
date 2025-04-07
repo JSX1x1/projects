@@ -43,7 +43,7 @@ Welcome to **Dev**, a collection of **developer programs, scripts, and utilities
 ### **📂 Running Scripts & Programs**  
 1. Clone the repository:  
    ```sh
-   git clone https://github.com/JSX1x1/dev.git
+   git clone https://github.com/JSX1x1/projects/dev.git
    cd dev
    ```
 2. Check the documentation for each tool before using it.  
